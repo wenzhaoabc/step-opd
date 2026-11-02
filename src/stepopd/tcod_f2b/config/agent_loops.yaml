@@ -1,0 +1,12 @@
+- name: alfworld
+  _target_: stepopd.tcod_f2b.agent_loop.CurriculumAgentLoop
+- name: alfworld_f2b
+  _target_: stepopd.tcod_f2b.agent_loop.CurriculumAgentLoop
+- name: scienceworld
+  _target_: stepopd.tcod_f2b.agent_loop.CurriculumAgentLoop
+- name: scienceworld_f2b
+  _target_: stepopd.tcod_f2b.agent_loop.CurriculumAgentLoop
+- name: search_r1
+  _target_: stepopd.tcod_f2b.agent_loop.CurriculumAgentLoop
+- name: search_r1_f2b
+  _target_: stepopd.tcod_f2b.agent_loop.CurriculumAgentLoop

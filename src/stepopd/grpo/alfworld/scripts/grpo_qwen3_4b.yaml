@@ -1,0 +1,72 @@
+# @package _global_
+defaults:
+  - /ppo_trainer
+  - /config/protocol
+  - _self_
+
+stepopd:
+  environment: alfworld
+  algorithm: grpo
+  data_dir: ${oc.env:STEPOPD_ROOT}/envs/alfworld
+  retrieval_url: http://127.0.0.1:8000/retrieve
+  max_tokens_per_turn: 1024
+
+data:
+  train_files: ${stepopd.data_dir}/train.parquet
+  val_files: ${stepopd.data_dir}/val.parquet
+  val_max_samples: 20
+  train_batch_size: 12
+  max_prompt_length: 2048
+  max_response_length: 14336
+  dataloader_num_workers: 0
+  seed: 42
+
+actor_rollout_ref:
+  model:
+    path: ${oc.env:STEPOPD_ROOT}/../models/Qwen3-4B
+    use_remove_padding: true
+    enable_gradient_checkpointing: true
+  actor:
+    optim:
+      lr: 1.0e-6
+    ppo_mini_batch_size: ${data.train_batch_size}
+    use_dynamic_bsz: true
+    ppo_max_token_len_per_gpu: 16384
+    fsdp_config:
+      param_offload: true
+      optimizer_offload: true
+    checkpoint:
+      save_contents: [model, optimizer, extra, hf_model]
+  rollout:
+    tensor_model_parallel_size: 1
+    gpu_memory_utilization: 0.8
+    max_model_len: 16385
+    n: 4
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    agent:
+      num_workers: 16
+    val_kwargs:
+      temperature: 0.4
+      do_sample: true
+      n: 1
+
+trainer:
+  nnodes: 1
+  n_gpus_per_node: 8
+  logger: [console, tensorboard, wandb]
+  project_name: stepopd_agenticrl
+  experiment_name: alfworld_grpo_qwen3_4b
+  default_local_dir: ${oc.env:STEPOPD_ROOT}/outputs/grpo/${trainer.experiment_name}
+  rollout_data_dir: ${trainer.default_local_dir}/rollouts
+  total_training_steps: 250
+  total_epochs: 1
+  save_freq: 25
+  test_freq: 25
+  val_before_train: false
+  max_actor_ckpt_to_keep: 2
+  resume_mode: auto
+
+distillation:
+  enabled: false

@@ -1,0 +1,60 @@
+# @package _global_
+defaults:
+  - /sft_trainer_engine
+  - /config/collection
+  - _self_
+
+collection:
+  opd_config: search_r1/scripts/opd_30b_to_1p7b.yaml
+
+sft:
+  environment: search_r1
+  teacher_model: Qwen3-30B-A3B
+  data_dir: ${oc.env:STEPOPD_ROOT}/outputs/sft/search_r1/sft_data
+
+data:
+  train_files: ${sft.data_dir}/train/*.parquet
+  val_files: null
+  custom_cls:
+    path: pkg://stepopd.sft.dataset
+    name: AgentSFTDataset
+  train_batch_size: 12
+  micro_batch_size_per_gpu: 1
+  max_length: 16384
+  max_token_len_per_gpu: 16384
+  use_dynamic_bsz: true
+  pad_mode: no_padding
+  truncation: error
+  num_workers: 2
+
+model:
+  path: ${oc.env:STEPOPD_ROOT}/../models/Qwen3-1.7B
+  use_remove_padding: true
+  enable_gradient_checkpointing: true
+
+engine:
+  strategy: fsdp2
+  ulysses_sequence_parallel_size: 2
+  model_dtype: bf16
+  dtype: bfloat16
+
+optim:
+  lr: 1.0e-6
+
+checkpoint:
+  save_contents: [model, optimizer, extra]
+
+trainer:
+  nnodes: 1
+  n_gpus_per_node: 8
+  total_epochs: null
+  total_training_steps: 250
+  save_freq: 25
+  test_freq: -1
+  max_actor_ckpt_to_keep: 2
+  seed: 42
+  logger: [console, tensorboard]
+  project_name: agenticrl-sft
+  experiment_name: search_r1-30b-to-1p7b
+  default_local_dir: ${oc.env:STEPOPD_ROOT}/outputs/sft/search_r1/sft_30b_to_1p7b
+  resume_mode: auto

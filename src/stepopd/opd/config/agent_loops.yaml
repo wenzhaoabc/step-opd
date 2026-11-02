@@ -1,0 +1,6 @@
+- name: alfworld
+  _target_: stepopd.opd.agent_loop.EnvironmentAgentLoop
+- name: scienceworld
+  _target_: stepopd.opd.agent_loop.EnvironmentAgentLoop
+- name: search_r1
+  _target_: stepopd.opd.agent_loop.EnvironmentAgentLoop

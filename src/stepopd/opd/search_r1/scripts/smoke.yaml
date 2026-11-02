@@ -1,0 +1,42 @@
+# @package _global_
+defaults:
+  - /search_r1/scripts@_global_: grpo_qwen3_8b
+  - _self_
+
+stepopd:
+  smoke_student_gpus:
+    grpo: 4
+    opd: 2
+  smoke_rollout_n:
+    grpo: 2
+    opd: 1
+
+data:
+  train_batch_size: 4
+  max_prompt_length: 2048
+  max_response_length: 6144
+  train_max_samples: 8
+  val_max_samples: 4
+
+actor_rollout_ref:
+  actor:
+    ppo_mini_batch_size: ${data.train_batch_size}
+  rollout:
+    tensor_model_parallel_size: 2
+    max_model_len: 8193
+    n: ${stepopd.smoke_rollout_n.${stepopd.algorithm}}
+
+trainer:
+  n_gpus_per_node: ${stepopd.smoke_student_gpus.${stepopd.algorithm}}
+  default_local_dir: ${oc.env:STEPOPD_ROOT}/outputs/opd/${trainer.experiment_name}_smoke
+  total_training_steps: 2
+  save_freq: 1
+  test_freq: 1
+
+distillation:
+  n_gpus_per_node: 2
+  teacher_models:
+    teacher_model:
+      inference:
+        tensor_model_parallel_size: 2
+        max_model_len: ${actor_rollout_ref.rollout.max_model_len}

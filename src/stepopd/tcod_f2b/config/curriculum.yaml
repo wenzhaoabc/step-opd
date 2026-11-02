@@ -1,0 +1,5 @@
+# @package _global_
+stepopd:
+  tcod:
+    k_start: 2
+    eta: 6

@@ -1,0 +1,89 @@
+# @package _global_
+stepopd:
+  algorithm: opsd
+  data_dir: ${oc.env:STEPOPD_ROOT}/envs/${stepopd.environment}
+  retrieval_url: http://127.0.0.1:8000/retrieve
+  max_tokens_per_turn: 1024
+  opsd:
+    skill_root: ${oc.env:OPSD_SKILL_ROOT,resources/opsd_skills}
+    default_category: null
+    skills_enabled: true
+    manifest_sha256: null
+    max_extra_tokens: 2048
+    max_teacher_sequence_length: 18432
+    loss:
+      loss_mode: k1
+      use_policy_gradient: true
+      use_task_rewards: false
+      loss_max_clamp: 15.0
+      log_prob_min_clamp: null
+      policy_loss_mode: vanilla
+      clip_ratio: 0.2
+      clip_ratio_low: 0.2
+      clip_ratio_high: 0.2
+
+data:
+  train_files: ${stepopd.data_dir}/train.parquet
+  val_files: ${stepopd.data_dir}/val.parquet
+  train_batch_size: 12
+  val_max_samples: 20
+  max_prompt_length: 2048
+  max_response_length: 14336
+  dataloader_num_workers: 0
+  seed: 42
+
+actor_rollout_ref:
+  model:
+    use_remove_padding: true
+    enable_gradient_checkpointing: true
+  actor:
+    optim:
+      lr: 1.0e-6
+    ppo_mini_batch_size: ${data.train_batch_size}
+    use_dynamic_bsz: true
+    ppo_max_token_len_per_gpu: 16384
+    fsdp_config:
+      param_offload: true
+      optimizer_offload: true
+    checkpoint:
+      save_contents: [model, optimizer, extra, hf_model]
+  rollout:
+    tensor_model_parallel_size: 1
+    gpu_memory_utilization: 0.8
+    max_model_len: 16385
+    log_prob_use_dynamic_bsz: true
+    log_prob_max_token_len_per_gpu: ${stepopd.opsd.max_teacher_sequence_length}
+    n: 1
+    temperature: 1.0
+    top_p: 1.0
+    top_k: -1
+    agent:
+      num_workers: 12
+    val_kwargs:
+      temperature: 0.4
+      do_sample: true
+      n: 1
+
+trainer:
+  nnodes: 1
+  n_gpus_per_node: 6
+  logger: [console, tensorboard, wandb]
+  project_name: stepopd_agenticrl
+  default_local_dir: ${oc.env:STEPOPD_ROOT}/outputs/opsd/${trainer.experiment_name}
+  rollout_data_dir: ${trainer.default_local_dir}/rollouts
+  total_training_steps: 250
+  total_epochs: 1
+  save_freq: 25
+  test_freq: 25
+  val_before_train: false
+  max_actor_ckpt_to_keep: 2
+  resume_mode: auto
+  v1:
+    trainer_mode: skill_opsd
+    skill_opsd:
+      parameter_sync_step: 1
+
+distillation:
+  enabled: false
+  n_gpus_per_node: 0
+  nnodes: 0

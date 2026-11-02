@@ -1,0 +1,17 @@
+# @package _global_
+collection:
+  teacher_path: ${oc.env:STEPOPD_ROOT}/../models/${sft.teacher_model}
+  work_dir: ${oc.env:STEPOPD_ROOT}/outputs/sft/teacher
+  data_dir: ${oc.env:STEPOPD_ROOT}/envs/${sft.environment}
+  rollout_dir: ${oc.env:STEPOPD_ROOT}/outputs/sft/${sft.environment}/sft_teacher
+  port: 8101
+  gpu_memory_utilization: 0.85
+  api_server_count: 1
+  max_num_seqs: 8
+  max_num_batched_tokens: 2048
+  temperature: 0.4
+  data_reuse_epochs: 1
+  max_attempts: 3
+  concurrency: 32
+  request_timeout: 600
+  request_retries: 2

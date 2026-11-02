@@ -1,0 +1,28 @@
+# @package _global_
+defaults:
+  - opsd_qwen3_1p7b
+  - _self_
+
+stepopd:
+  opsd:
+    max_teacher_sequence_length: 6144
+
+data:
+  train_batch_size: 6
+  train_max_samples: 16
+  val_max_samples: 4
+  max_response_length: 2048
+
+actor_rollout_ref:
+  rollout:
+    max_model_len: 4097
+    agent:
+      num_workers: 6
+
+trainer:
+  experiment_name: alfworld_skill_opsd_smoke
+  total_training_steps: 2
+  save_freq: 1
+  test_freq: 1
+  val_before_train: false
+

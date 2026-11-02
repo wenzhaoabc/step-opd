@@ -1,0 +1,43 @@
+# @package _global_
+algorithm:
+  adv_estimator: grpo
+  use_kl_in_reward: false
+data:
+  truncation: error
+  continuous_token:
+    enable: true
+    model_family: qwen3
+  apply_chat_template_kwargs:
+    enable_thinking: false
+actor_rollout_ref:
+  actor:
+    use_kl_loss: false
+    checkpoint:
+      save_contents: [model, optimizer, extra]
+  rollout:
+    name: vllm
+    mode: async
+    calculate_log_probs: true
+    multi_turn:
+      enable: true
+    agent:
+      default_agent_loop: ${stepopd.environment}
+      agent_loop_config_path: config/agent_loops.yaml
+trainer:
+  use_v1: true
+  v1:
+    trainer_mode: colocate_async
+    colocate_async:
+      num_warmup_batches: 1
+    sampler:
+      max_off_policy_threshold: 2
+      max_off_policy_strategy: drop
+
+
+distillation:
+  teacher_models:
+    teacher_model:
+      inference:
+        engine_kwargs:
+          vllm:
+            safetensors_load_strategy: eager

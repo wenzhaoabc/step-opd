@@ -1,0 +1,16 @@
+--- a/verl/verl/experimental/agent_loop/agent_loop.py
++++ b/verl/verl/experimental/agent_loop/agent_loop.py
+@@ -488,7 +488,12 @@
+ 
+     def decorator(subclass: type[AgentLoopBase]) -> type[AgentLoopBase]:
+         fqdn = f"{subclass.__module__}.{subclass.__qualname__}"
+-        _agent_loop_registry[agent_name] = {"_target_": fqdn}
++        # The class module is typically imported lazily by the first
++        # hydra.utils.instantiate call, which happens AFTER the agent loop
++        # config file has registered a full config under the same name.
++        # Overwriting here would leave later prompts with a bare target and
++        # drop constructor arguments, so keep any existing full config.
++        _agent_loop_registry.setdefault(agent_name, {"_target_": fqdn})
+         return subclass
+ 
+     return decorator

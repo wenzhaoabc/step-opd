@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stepopd"
+version = "0.1.0"
+description = "Agent environments and on-policy distillation for verl"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "stepopd contributors" }]
+requires-python = ">=3.10"
+keywords = ["on-policy-distillation", "agent", "reinforcement-learning", "verl", "alfworld"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "hydra-core>=1.3,<2",
+  "httpx>=0.28,<1",
+  "jinja2>=3.1,<4",
+  "numpy>=1.26",
+  "omegaconf>=2.3,<3",
+  "pandas>=2.2,<4",
+  "pyarrow>=19",
+  "pydantic>=2,<3",
+  "psutil>=5.9,<8",
+  "python-dotenv>=1,<2",
+  "pyyaml>=6,<7",
+  "tqdm>=4.67,<5",
+]
+
+[project.optional-dependencies]
+environments = ["alfworld==0.4.2", "textworld[pddl]==1.7.0", "scienceworld==1.2.3"]
+retrieval = ["pyserini==0.35.0", "faiss-cpu", "fastapi", "uvicorn", "datasets"]
+figures = ["matplotlib>=3.8", "tensorboard>=2.14"]
+
+[tool.setuptools.package-data]
+"stepopd.opd" = ["config/*.yaml"]
+"stepopd.opd.alfworld" = ["scripts/*.yaml"]
+"stepopd.opd.scienceworld" = ["scripts/*.yaml"]
+"stepopd.opd.search_r1" = ["scripts/*.sh", "scripts/*.yaml"]
+"stepopd.grpo" = ["*.sh"]
+"stepopd.grpo.alfworld" = ["scripts/*.yaml"]
+"stepopd.grpo.scienceworld" = ["scripts/*.yaml"]
+"stepopd.grpo.search_r1" = ["scripts/*.yaml"]
+"stepopd.opsd" = ["config/*.yaml", "*.sh"]
+"stepopd.opsd.alfworld" = ["scripts/*.yaml"]
+"stepopd.opsd.scienceworld" = ["scripts/*.yaml"]
+"stepopd.opsd.search_r1" = ["scripts/*.yaml"]
+"stepopd.runtime" = ["scripts/*.sh"]
+"stepopd.sft" = ["config/*.yaml", "*.sh"]
+"stepopd.sft.alfworld" = ["scripts/*.yaml"]
+"stepopd.sft.scienceworld" = ["scripts/*.yaml"]
+"stepopd.sft.search_r1" = ["scripts/*.yaml"]
+"stepopd.tcod_f2b" = ["config/*.yaml", "*.sh"]
+"stepopd.tcod_f2b.alfworld" = ["scripts/*.yaml"]
+"stepopd.tcod_f2b.scienceworld" = ["scripts/*.yaml"]
+"stepopd.tcod_f2b.search_r1" = ["scripts/*.yaml"]
+"stepopd.eval" = ["*.sh"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

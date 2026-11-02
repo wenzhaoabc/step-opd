@@ -1,0 +1,6 @@
+# ruff 配置（等价形式亦可为 pyproject.toml 的 [tool.ruff]，此处独立成文件避免双源）
+[lint]
+select = ["E", "F", "I", "W", "UP"]  # E:语法错误, F:pyflakes, I:import排序, UP:pyupgrade
+
+[lint.isort]
+known-first-party = ["stepopd"]

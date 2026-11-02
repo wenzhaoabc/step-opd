@@ -1,0 +1,17 @@
+# @package _global_
+defaults:
+  - /ppo_trainer
+  - /config/protocol
+  - /config/skill_opsd
+  - _self_
+
+stepopd:
+  environment: alfworld
+
+actor_rollout_ref:
+  model:
+    path: ${oc.env:STEPOPD_ROOT}/../models/Qwen3-1.7B
+
+trainer:
+  experiment_name: alfworld_skill_opsd_qwen3_1p7b
+
